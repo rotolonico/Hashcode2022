@@ -1,0 +1,15 @@
+/Users/nicorotolo/Downloads/Hashcode2022/bin/Debug/netcoreapp5.0/Hashcode2022.deps.json
+/Users/nicorotolo/Downloads/Hashcode2022/bin/Debug/netcoreapp5.0/Hashcode2022.runtimeconfig.json
+/Users/nicorotolo/Downloads/Hashcode2022/bin/Debug/netcoreapp5.0/Hashcode2022.runtimeconfig.dev.json
+/Users/nicorotolo/Downloads/Hashcode2022/bin/Debug/netcoreapp5.0/Hashcode2022.dll
+/Users/nicorotolo/Downloads/Hashcode2022/bin/Debug/netcoreapp5.0/ref/Hashcode2022.dll
+/Users/nicorotolo/Downloads/Hashcode2022/bin/Debug/netcoreapp5.0/Hashcode2022.pdb
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.csproj.AssemblyReference.cache
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.GeneratedMSBuildEditorConfig.editorconfig
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.AssemblyInfoInputs.cache
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.AssemblyInfo.cs
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.csproj.CoreCompileInputs.cache
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.dll
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/ref/Hashcode2022.dll
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.pdb
+/Users/nicorotolo/Downloads/Hashcode2022/obj/Debug/netcoreapp5.0/Hashcode2022.genruntimeconfig.cache
