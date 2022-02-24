@@ -55,10 +55,43 @@ namespace Hashcode2022
         private List<string> RunAlgorithm(List<string> input)
         {
             var i = ParseInput(input);
-            Console.Write(i);
+            var o = new Output { assignments = new List<KeyValuePair<string, List<string>>>()};
 
+            i.projects = i.projects.OrderBy(p => p.Value.bestBefore).ToList();
 
-            return input;
+            foreach (var p in i.projects)
+            {
+                var includeProject = true;
+                var currentContributors = new List<Contributor>();
+                
+                foreach (var r in p.Value.roles)
+                {
+                    var contributor = i.contributors.FirstOrDefault(c =>
+                        !c.Value.isWorking && c.Value.skills.Any(s => s.Key == r.Key && s.Value >= r.Value));
+                    
+
+                    if (contributor.Equals(default(KeyValuePair<string, Contributor>)))
+                    {
+                        includeProject = false;
+                        break;
+                    }
+
+                    contributor.Value.isWorking = true;
+                    currentContributors.Add(contributor.Value);
+                    
+                }
+
+                if (!includeProject)
+                {
+                    currentContributors.ForEach(c => c.isWorking = false);
+                    continue;
+                }
+
+                o.assignments.Add(new KeyValuePair<string, List<string>>(p.Key, currentContributors.Select(c => c.id).ToList()));
+                o.p++;
+            }
+            
+            return ParseOutput(o);
         }
 
         private static Input ParseInput(IReadOnlyList<string> input)
@@ -117,6 +150,19 @@ namespace Hashcode2022
             }
 
             return i;
+        }
+
+        private static List<string> ParseOutput(Output output)
+        {
+            var o = new List<string> {output.p.ToString()};
+
+            foreach (var a in output.assignments)
+            {
+                o.Add(a.Key);
+                o.Add(string.Join(' ', a.Value));
+            }
+
+            return o;
         }
     }
 }

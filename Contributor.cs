@@ -6,5 +6,6 @@ namespace Hashcode2022
     {
         public string id;
         public List<KeyValuePair<string, int>> skills = new();
+        public bool isWorking;
     }
 }
