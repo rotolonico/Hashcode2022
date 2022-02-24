@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/nicorotolo/Downloads/Hashcode2022/Hashcode2022.csproj",
+      "projectUniqueName": "/Users/nicorotolo/Downloads/Hashcode2022/Hashcode2022/Hashcode2022.csproj",
       "projectName": "Hashcode2022",
-      "projectPath": "/Users/nicorotolo/Downloads/Hashcode2022/Hashcode2022.csproj",
+      "projectPath": "/Users/nicorotolo/Downloads/Hashcode2022/Hashcode2022/Hashcode2022.csproj",
       "packagesPath": "/Users/nicorotolo/.nuget/packages/",
-      "outputPath": "/Users/nicorotolo/Downloads/Hashcode2022/obj/",
+      "outputPath": "/Users/nicorotolo/Downloads/Hashcode2022/Hashcode2022/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/nicorotolo/.nuget/NuGet/NuGet.Config"

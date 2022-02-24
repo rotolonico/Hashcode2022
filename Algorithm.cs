@@ -26,7 +26,7 @@ namespace Hashcode2022
 
         private async Task AsyncRun(string file)
         {
-            string outputPath = file.Substring(0, file.Length - 2) + "out";
+            string outputPath = file.Substring(0, file.Length - 3) + "out";
             string name = "[" + file.Substring(file.LastIndexOf(Path.DirectorySeparatorChar) + 1, file.Length - file.LastIndexOf(Path.DirectorySeparatorChar) - 1) + "]";
 
             await Task.Run(() =>
