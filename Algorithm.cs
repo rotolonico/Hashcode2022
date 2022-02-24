@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,14 +36,18 @@ namespace Hashcode2022
             {
                 try
                 {
-                    TimeHandler.StartTimer(name);
+                    //TimeHandler.StartTimer(name);
                     Console.WriteLine($"{name} Processing...");
 
                     var input = IOHandler.LoadFile(file);
-                    var output = RunAlgorithm(input);
+                    var output = RunAlgorithm(input, o =>
+                    {
+                        IOHandler.SaveFile(outputPath, o);
+                    });
+                    
                     IOHandler.SaveFile(outputPath, output);
 
-                    Console.WriteLine($"{name} Done! (Took: " + (TimeHandler.EndTimer(name)) + "ms to complete)");
+                    Console.WriteLine($"{name} Done!");
                 }
                 catch (Exception ex)
                 {
@@ -52,23 +57,78 @@ namespace Hashcode2022
             });
         }
 
-        private List<string> RunAlgorithm(List<string> input)
+        private List<string> RunAlgorithm(List<string> input, Action<List<string>> partialCallback)
         {
             var i = ParseInput(input);
-            var o = new Output { assignments = new List<KeyValuePair<string, List<string>>>()};
+            var o = new Output {assignments = new List<KeyValuePair<string, Assignment>>()};
 
-            i.projects = i.projects.OrderBy(p => p.Value.bestBefore).ToList();
+            i.projects = i.projects.OrderByDescending(p => p.Value.score / (p.Value.bestBefore + p.Value.duration))
+                .ToList();
 
-            foreach (var p in i.projects)
+            var activeContributors = i.contributors;
+            var activeProjects = i.projects;
+
+            var day = 0;
+
+            while (true)
+            {
+                partialCallback(ParseOutput(o));
+                
+                var result = AssignContributorsToProjects(day, o, activeContributors, activeProjects);
+
+                activeContributors = result.availableContributors;
+                activeProjects = result.availableProjects;
+
+                if (o.assignments.Any(a => !a.Value.isDone))
+                {
+                    var minActiveAssignment = o.assignments.Where(a => !a.Value.isDone)
+                        .MinBy(a => a.Value.project.Value.duration);
+                    minActiveAssignment.Value.isDone = true;
+                    day += minActiveAssignment.Value.project.Value.duration;
+                    result.availableContributors.AddRange(minActiveAssignment.Value.contributors);
+                    
+                    for (var r = 0; r < minActiveAssignment.Value.project.Value.roles.Count; r++)
+                    {
+                        KeyValuePair<string, Contributor> cont = minActiveAssignment.Value.contributors[r];
+                        KeyValuePair<string, int> role = minActiveAssignment.Value.project.Value.roles[r];
+
+                        var skill = cont.Value.skills.Find(s => s.Key == role.Key);
+                        if (skill.Value == role.Value)
+                        {
+                            cont.Value.skills.Remove(skill);
+                            cont.Value.skills.Add(new KeyValuePair<string, int>(skill.Key, skill.Value + 1));
+                        }
+                    }
+                    
+
+                    continue;
+                }
+
+                break;
+            }
+
+
+            return ParseOutput(o);
+        }
+
+        [SuppressMessage("ReSharper.DPA", "DPA0001: Memory allocation issues")]
+        private Result AssignContributorsToProjects(int day, Output o,
+            List<KeyValuePair<string, Contributor>> contributors, List<KeyValuePair<string, Project>> projects)
+        {
+            var aAssignments = new List<KeyValuePair<string, Assignment>>();
+            var aProjects = new List<KeyValuePair<string, Project>>(projects);
+            var aContributors = new List<KeyValuePair<string, Contributor>>(contributors);
+
+            foreach (var p in projects)
             {
                 var includeProject = true;
-                var currentContributors = new List<Contributor>();
-                
+                var currentContributors = new List<KeyValuePair<string, Contributor>>();
+
                 foreach (var r in p.Value.roles)
                 {
-                    var contributor = i.contributors.FirstOrDefault(c =>
-                        !c.Value.isWorking && c.Value.skills.Any(s => s.Key == r.Key && s.Value >= r.Value));
-                    
+                    var contributor = contributors.FirstOrDefault(c =>
+                        c.Value.isOccupiedUntil < day && c.Value.skills.Any(s => s.Key == r.Key && s.Value >= r.Value));
+
 
                     if (contributor.Equals(default(KeyValuePair<string, Contributor>)))
                     {
@@ -76,22 +136,39 @@ namespace Hashcode2022
                         break;
                     }
 
-                    contributor.Value.isWorking = true;
-                    currentContributors.Add(contributor.Value);
-                    
+                    contributor.Value.isOccupiedUntil = day + p.Value.duration;
+                    currentContributors.Add(contributor);
                 }
 
                 if (!includeProject)
                 {
-                    currentContributors.ForEach(c => c.isWorking = false);
+                    currentContributors.ForEach(c => c.Value.isOccupiedUntil = day - 1);
                     continue;
                 }
 
-                o.assignments.Add(new KeyValuePair<string, List<string>>(p.Key, currentContributors.Select(c => c.id).ToList()));
+                var assignment = new KeyValuePair<string, Assignment>(p.Key, new Assignment
+                {
+                    project = p,
+                    isDone = false,
+                    contributors = currentContributors
+                });
+                o.assignments.Add(assignment);
+
+                aAssignments.Add(assignment);
+                aProjects.Remove(p);
+                aContributors.RemoveAll(c => currentContributors.Contains(c));
+
+                p.Value.isAssigned = true;
+
                 o.p++;
             }
-            
-            return ParseOutput(o);
+
+            return new Result
+            {
+                addedAssignments = aAssignments,
+                availableProjects = aProjects,
+                availableContributors = aContributors
+            };
         }
 
         private static Input ParseInput(IReadOnlyList<string> input)
@@ -129,7 +206,7 @@ namespace Hashcode2022
             while (projectsLeft > 0)
             {
                 currentLine++;
-                
+
                 var line = input[currentLine].Split(' ');
                 var project = new Project
                 {
@@ -159,7 +236,7 @@ namespace Hashcode2022
             foreach (var a in output.assignments)
             {
                 o.Add(a.Key);
-                o.Add(string.Join(' ', a.Value));
+                o.Add(string.Join(' ', a.Value.contributors.Select(c => c.Value.id)));
             }
 
             return o;

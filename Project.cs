@@ -9,5 +9,7 @@ namespace Hashcode2022
         public int bestBefore;
         public int score;
         public List<KeyValuePair<string, int>> roles = new();
+
+        public bool isAssigned;
     }
 }
