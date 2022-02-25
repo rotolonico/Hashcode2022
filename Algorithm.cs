@@ -62,7 +62,7 @@ namespace Hashcode2022
             var i = ParseInput(input);
             var o = new Output {assignments = new List<KeyValuePair<string, Assignment>>()};
 
-            i.projects = i.projects.OrderByDescending(p => p.Value.score / (p.Value.bestBefore + p.Value.duration))
+            i.projects = i.projects.OrderByDescending(p => (float) p.Value.score / (p.Value.bestBefore + p.Value.duration))
                 .ToList();
 
             var activeContributors = i.contributors;
